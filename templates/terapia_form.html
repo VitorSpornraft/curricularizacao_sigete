@@ -1,0 +1,60 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}{% if terapia %}Editar Terapia{% else %}Nova Terapia{% endif %}{% endblock %}
+
+{% block app_content %}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0">
+                {% if terapia %}
+                    <i class="bi bi-pencil-fill me-2"></i>Editando Terapia: {{ terapia.nome }}
+                {% else %}
+                    <i class="bi bi-heart-pulse-fill me-2"></i>Cadastrar Nova Terapia
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label">{{ form.nome.label }}</label>
+                    {{ form.nome }}
+                    <div class="text-danger small">{{ form.nome.errors }}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label classs="form-label">{{ form.sigla.label }}</label>
+                    {{ form.sigla }}
+                    <div class="text-danger small">{{ form.sigla.errors }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">{{ form.cor.label }}</label>
+                    {{ form.cor }}
+                    <div class="text-danger small">{{ form.cor.errors }}</div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'terapia_list' %}" class="btn btn-light border">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Salvar Terapia</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

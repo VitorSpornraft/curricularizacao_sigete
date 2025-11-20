@@ -1,0 +1,37 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block app_content %}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão Permanente</h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <p class="fs-5">Você tem certeza que deseja excluir permanentemente a escola:</p>
+            
+            <h3 class="mb-4 text-center">{{ escola.nome }}</h3>
+            
+            <p class="text-danger"><strong>Atenção:</strong> Esta ação não pode ser desfeita. Se esta escola estiver vinculada a algum aluno (mesmo arquivado), a exclusão irá **falhar** para proteger a integridade dos dados.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'escola_arquivados' %}" class="btn btn-light border">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill me-2"></i>Sim, excluir permanentemente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

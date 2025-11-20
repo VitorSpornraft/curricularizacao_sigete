@@ -1,0 +1,115 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Consultas{% endblock %}
+
+{% block app_content %}
+
+<form method="GET" action="{% url 'dashboard' %}">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Filtros de Busca</h5>
+                <a href="{% url 'dashboard' %}" class="btn btn-link btn-sm">Limpar filtros</a>
+            </div>
+
+            <div class="row g-3 align-items-center">
+
+                <div class="col-md-3">
+                    <input type="text" class="form-control"
+                           name="busca_nome"
+                           placeholder="Buscar aluno..."
+                           value="{{ busca_nome_selecionado|default_if_none:'' }}">
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select" name="filtro_escola">
+                        <option value="">Todas as Escolas</option>
+                            {% for escola in escolas %}
+                            <option value="{{ escola.pk }}"
+                                    {% if filtro_escola_selecionado == escola.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ escola.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select class="form-select" name="filtro_dia">
+                        <option value="" {% if not filtro_dia_selecionado %}selected{% endif %}>Dia</option>
+                        <option value="SEG" {% if filtro_dia_selecionado == 'SEG' %}selected{% endif %}>Segunda</option>
+                        <option value="TER" {% if filtro_dia_selecionado == 'TER' %}selected{% endif %}>Terça</option>
+                        <option value="QUA" {% if filtro_dia_selecionado == 'QUA' %}selected{% endif %}>Quarta</option>
+                        <option value="QUI" {% if filtro_dia_selecionado == 'QUI' %}selected{% endif %}>Quinta</option>
+                        <option value="SEX" {% if filtro_dia_selecionado == 'SEX' %}selected{% endif %}>Sexta</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select class="form-select" name="filtro_turno">
+                        <option value="" {% if not filtro_turno_selecionado %}selected{% endif %}>Turno</option>
+                        <option value="manha" {% if filtro_turno_selecionado == 'manha' %}selected{% endif %}>Manhã</option>
+                        <option value="tarde" {% if filtro_turno_selecionado == 'tarde' %}selected{% endif %}>Tarde</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Atendimentos</h5>
+    <span class="text-muted">{{ atendimentos.count }} atendimento(s) encontrado(s)</span>
+</div>
+
+{% for atendimento in atendimentos %}
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body p-4">
+
+        <h5 class="mb-1">{{ atendimento.aluno.nome_completo }}</h5>
+
+        <p class="text-primary mb-1">
+            <i class="bi bi-building me-1"></i>
+            <strong>{{ atendimento.aluno.escola.nome }}</strong>
+        </p>
+
+        <p class="text-muted mb-2">
+            {{ atendimento.aluno.get_ano_escolar_display }} •
+            {% if atendimento.aluno.diagnostico %}
+                {{ atendimento.aluno.diagnostico.sigla }} - {{ atendimento.aluno.diagnostico.nome }}
+            {% else %}
+                Sem diagnóstico
+            {% endif %}
+        </p>
+
+        <span class="badge bg-{{ atendimento.terapia.cor }} mb-3">
+            {{ atendimento.terapia.sigla }}
+        </span>
+
+        <div class="d-flex text-muted">
+            <span class="me-3">
+                <strong>{{ atendimento.get_dia_da_semana_display }}</strong>
+            </span>
+            <span class="mx-3">
+                <strong>{{ atendimento.horario_inicio|time:"H:i" }}–{{ atendimento.horario_fim|time:"H:i" }}</strong>
+            </span>
+        </div>
+
+    </div>
+</div>
+
+{% empty %}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body p-4 text-center">
+            <p class="text-muted mb-0">Nenhum atendimento encontrado.</p>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock %}

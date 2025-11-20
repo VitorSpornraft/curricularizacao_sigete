@@ -1,0 +1,83 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Alunos Arquivados{% endblock %}
+
+{% block app_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4">Alunos Arquivados</h2>
+        <p class="text-muted">Lista de alunos que foram arquivados.</p>
+    </div>
+    <a href="{% url 'cadastros' %}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Voltar para Cadastros
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Ano</th>
+                    <th scope="col">Escola</th>
+                    <th scope="col">Diagnóstico</th>
+                    <th scope="col">Terapias</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aluno in alunos %}
+                <tr>
+                   <td>
+                        {{ aluno.nome_completo }}
+                        {% if aluno.transporte_escolar %}
+                            <i class="bi bi-bus-front-fill text-info ms-2" title="Necessita de Transporte Escolar"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ aluno.get_ano_escolar_display }}</td>
+                    <td>{{ aluno.escola.nome }}</td>
+                   <td>
+                        {% if aluno.diagnostico %}
+                            <b>{{ aluno.diagnostico.sigla }}</b>
+                        {% else %}
+                            <span class="text-muted">Nenhum</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% for matricula in aluno.matricula_set.all %}
+                            <span class="badge bg-{{ matricula.terapia.cor }} me-1">
+                                {{ matricula.terapia.sigla }}
+                            </span>
+                        {% empty %}
+                            <span class="text-muted">Nenhuma terapia</span>
+                        {% endfor %}
+                    </td>
+                    <td class="d-flex gap-2">
+                        <form method="POST" action="{% url 'aluno_restaurar' aluno.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                            </button>
+                        </form>
+
+                        <a href="{% url 'aluno_delete_permanente' aluno.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted p-4"> Nenhum aluno arquivado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

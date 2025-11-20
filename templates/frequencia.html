@@ -1,0 +1,130 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Registro de Frequência{% endblock %}
+
+{% block app_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4">Registro de Frequência</h2>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+        <form method="GET" action="{% url 'frequencia' %}" class="row g-3 align-items-end">
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Data</label>
+                <input type="date" class="form-control" name="data" value="{{ data_chamada_str }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Terapia</label>
+                <select class="form-select" name="terapia">
+                    <option value="">Todas as Terapias</option>
+                    {% for terapia in terapias %}
+                        <option value="{{ terapia.pk }}" {% if filtro_terapia_selecionado == terapia.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ terapia.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Turno</label>
+                <select class="form-select" name="turno">
+                    <option value="">Todos os Turnos</option>
+                    <option value="manha" {% if filtro_turno_selecionado == 'manha' %}selected{% endif %}>Manhã</option>
+                    <option value="tarde" {% if filtro_turno_selecionado == 'tarde' %}selected{% endif %}>Tarde</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                <a href="{% url 'frequencia' %}" class="btn btn-outline-secondary w-100">Limpar</a>
+            </div>
+        </form>
+
+        {% if bloqueado %}
+            <div class="alert alert-warning mt-3 mb-0 py-2">
+                <i class="bi bi-lock-fill me-2"></i> <strong>Modo Leitura:</strong> Edição bloqueada para datas passadas/futuras.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if lista_de_chamada %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="data" value="{{ data_chamada_str }}">
+    <input type="hidden" name="terapia_id" value="{{ filtro_terapia_selecionado|default_if_none:'' }}">
+    <input type="hidden" name="turno" value="{{ filtro_turno_selecionado|default_if_none:'' }}">
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-people-fill me-2"></i>Lista de Alunos</h5>
+
+            {% if not bloqueado %}
+
+            {% endif %}
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="ps-4">Aluno / Escola</th>
+                        <th scope="col">Detalhes</th>
+                        <th scope="col" class="text-center" style="width: 35%;">Presença</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for matricula in lista_de_chamada %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">{{ matricula.aluno.nome_completo }}</div>
+                            <div class="small text-muted">{{ matricula.aluno.escola.nome }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ matricula.terapia.cor }} mb-1">{{ matricula.terapia.sigla }}</span>
+                            <div class="small text-muted">
+                                {{ matricula.get_dia_da_semana_display }} • {{ matricula.horario_inicio|time:"H:i" }}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            {% if bloqueado %}
+                                {% if matricula.status_hoje == 'P' %}<span class="badge bg-success p-2">Presente</span>{% endif %}
+                                {% if matricula.status_hoje == 'F' %}<span class="badge bg-danger p-2">Falta</span>{% endif %}
+                                {% if matricula.status_hoje == 'FJ' %}<span class="badge bg-warning text-dark p-2">Justificada</span>{% endif %}
+                                {% if not matricula.status_hoje %}<span class="badge bg-secondary p-2">-</span>{% endif %}
+                            {% else %}
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="status_{{ matricula.id }}" id="p_{{ matricula.id }}" value="P" {% if matricula.status_hoje == 'P' or not matricula.status_hoje %}checked{% endif %}>
+                                    <label class="btn btn-outline-success btn-sm" for="p_{{ matricula.id }}">Presente</label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ matricula.id }}" id="f_{{ matricula.id }}" value="F" {% if matricula.status_hoje == 'F' %}checked{% endif %}>
+                                    <label class="btn btn-outline-danger btn-sm" for="f_{{ matricula.id }}">Falta</label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ matricula.id }}" id="fj_{{ matricula.id }}" value="FJ" {% if matricula.status_hoje == 'FJ' %}checked{% endif %}>
+                                    <label class="btn btn-outline-warning text-dark btn-sm" for="fj_{{ matricula.id }}">Justif.</label>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not bloqueado %}
+        <div class="card-footer bg-white p-3 text-end">
+             <button type="submit" class="btn btn-success">Salvar Chamada</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}{% if escola %}Editar Escola{% else %}Nova Escola{% endif %}{% endblock %}
+
+{% block app_content %}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0">
+                {% if escola %}
+                    <i class="bi bi-pencil-fill me-2"></i>Editando Escola: {{ escola.nome }}
+                {% else %}
+                    <i class="bi bi-building-fill-add me-2"></i>Cadastrar Nova Escola
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label">{{ form.nome.label }}</label>
+                    {{ form.nome }}
+                    <div class="text-danger small">{{ form.nome.errors }}</div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'escola_list' %}" class="btn btn-light border">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Salvar Escola</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

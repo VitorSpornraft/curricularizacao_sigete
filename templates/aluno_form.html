@@ -1,0 +1,136 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Novo Aluno{% endblock %}
+
+{% block app_content %}
+
+<div class="container mt-4" style="max-width: 800px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0">
+                {% if aluno %}
+                    <i class="bi bi-pencil-fill me-2"></i>Editando Aluno: {{ aluno.nome_completo }}
+                {% else %}
+                    <i class="bi bi-person-plus-fill me-2"></i>Cadastrar Novo Aluno
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body p-4">
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label">{{ form.nome_completo.label }}</label>
+                        {{ form.nome_completo }}
+                        <div class="text-danger small">{{ form.nome_completo.errors }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.escola.label }}</label>
+                        {{ form.escola }}
+                        <div class="text-danger small">{{ form.escola.errors }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.ano_escolar.label }}</label>
+                        {{ form.ano_escolar }}
+                        <div class="text-danger small">{{ form.ano_escolar.errors }}</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">{{ form.diagnostico.label }}</label>
+                        {{ form.diagnostico }}
+                        <div class="text-danger small">{{ form.diagnostico.errors }}</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-check mt-3">
+                            {{ form.transporte_escolar }}
+                            <label class="form-check-label" for="{{ form.transporte_escolar.id_for_label }}">
+                                O aluno necessita de transporte escolar gratuito?
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h5 class="mb-3"><i class="bi bi-calendar-check-fill me-2"></i>Vincular Terapias/Atendimentos</h5>
+
+                {{ formset.management_form }}
+
+                <div class="text-danger small">
+                    {{ formset.non_form_errors }}
+                </div>
+
+                {% for form_matricula in formset %}
+
+                {{ form_matricula.id }}
+
+                <div class="row g-3 mb-3 p-3 border rounded bg-light">
+
+                    <div class="col-md-7">
+                        <label class="form-label">Terapia</label>
+                        {{ form_matricula.terapia }}
+                        <div class="text-danger small">{{ form_matricula.terapia.errors }}</div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Dia da Semana</label>
+                        {{ form_matricula.dia_da_semana }}
+                        <div class="text-danger small">{{ form_matricula.dia_da_semana.errors }}</div>
+                    </div>
+
+                   <div class="col-md-3">
+                        <label class="form-label">Início</label>
+                        {{ form_matricula.horario_inicio }}
+                        <div class="text-danger small">{{ form_matricula.horario_inicio.errors }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Fim</label>
+                        {{ form_matricula.horario_fim }}
+                        <div class="text-danger small">{{ form_matricula.horario_fim.errors }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        {{ form_matricula.status }}
+                        <div class="text-danger small">{{ form_matricula.status.errors }}</div>
+                    </div>
+
+                    {% if form_matricula.instance.pk %}
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-check text-danger">
+                            {{ form_matricula.DELETE }}
+                            <label class="form-check-label" for="{{ form_matricula.DELETE.id_for_label }}">
+                                Excluir
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'cadastros' %}" class="btn btn-light border">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Salvar Aluno</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Terapias Arquivadas{% endblock %}
+
+{% block app_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="h4">Terapias Arquivadas</h2>
+        <p class="text-muted">Lista de terapias que foram arquivadas.</p>
+    </div>
+    <a href="{% url 'terapia_list' %}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Voltar para Terapias
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Nome da Terapia</th>
+                    <th scope="col">Sigla</th>
+                    <th scope="col">Cor</th>
+                    <th scope="col" class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for terapia in terapias %}
+                <tr>
+                   <td>{{ terapia.nome }}</td>
+                   <td><b>{{ terapia.sigla }}</b></td>
+                   <td><span class="badge bg-{{ terapia.cor }}">{{ terapia.get_cor_display }}</span></td>
+                   <td class="text-end d-flex gap-2 justify-content-end">
+                        <form method="POST" action="{% url 'terapia_restaurar' terapia.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'terapia_delete_permanente' terapia.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-4">
+                        Nenhuma terapia arquivada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
